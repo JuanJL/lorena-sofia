@@ -24,44 +24,34 @@ export default function Countdown() {
   }, []);
 
   const labels = {
-    es: { d: "días", h: "horas", m: "min", s: "seg" },
-    en: { d: "days", h: "hours", m: "min", s: "sec" },
+    en: { d: "Days", h: "Hours", m: "Minutes", s: "Seconds" },
+    es: { d: "D\u00EDas", h: "Horas", m: "Minutos", s: "Segundos" },
   }[lang];
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
+  const items = [
+    { value: String(t.days), label: labels.d },
+    { value: pad(t.hours), label: labels.h },
+    { value: pad(t.minutes), label: labels.m },
+    { value: pad(t.seconds), label: labels.s },
+  ];
+
   return (
-    <div className="flex items-center justify-center gap-2 md:gap-4">
-      {[
-        { value: t.days, label: labels.d, big: true },
-        { value: t.hours, label: labels.h },
-        { value: t.minutes, label: labels.m },
-        { value: t.seconds, label: labels.s },
-      ].map((item, i) => (
-        <div key={i} className="flex items-center">
-          <div className="flex flex-col items-center">
-            <div
-              className={`paper-texture polaroid-shadow rounded-lg border border-gold/40 px-3 py-2 md:px-5 md:py-3 ${
-                item.big ? "min-w-[70px] md:min-w-[100px]" : "min-w-[54px] md:min-w-[70px]"
-              }`}
-            >
-              <div
-                className={`font-heading font-light text-warm-dark tabular-nums ${
-                  item.big
-                    ? "text-3xl md:text-5xl"
-                    : "text-2xl md:text-3xl"
-                }`}
-              >
-                {item.big ? item.value : pad(item.value)}
-              </div>
+    <div className="flex items-start justify-center gap-4 md:gap-8">
+      {items.map((item, i) => (
+        <div key={i} className="flex items-start gap-4 md:gap-8">
+          <div className="flex min-w-[60px] flex-col items-center md:min-w-[90px]">
+            <div className="font-heading text-4xl leading-none font-light text-warm-dark tabular-nums md:text-6xl">
+              {item.value}
             </div>
-            <div className="mt-2 text-[10px] font-medium tracking-[0.2em] text-gold uppercase md:text-xs">
+            <div className="mt-3 text-[9px] font-medium tracking-[0.3em] text-gold-deep uppercase md:text-[10px]">
               {item.label}
             </div>
           </div>
-          {i < 3 && (
-            <span className="mx-1 -mt-4 text-xl text-gold/50 md:mx-2 md:text-2xl">
-              :
+          {i < items.length - 1 && (
+            <span className="font-heading text-4xl leading-none font-light text-gold/50 md:text-6xl">
+              ·
             </span>
           )}
         </div>
