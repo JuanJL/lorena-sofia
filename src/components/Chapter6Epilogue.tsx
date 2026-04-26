@@ -23,7 +23,7 @@ export default function Chapter6Epilogue() {
           madeWith: "Hecho con",
           forThe: "para celebrar el cumplea\u00F1os de",
           hint: "psst\u2026 prueba el c\u00F3digo konami \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192 B A",
-          secretUnlocked: "\u00A1Has encontrado el secreto del sombrero!",
+          secretUnlocked: "\u00A1La guacamaya cant\u00F3 tu nombre!",
         }
       : {
           number: "Chapter VI",
@@ -36,7 +36,7 @@ export default function Chapter6Epilogue() {
           madeWith: "Made with",
           forThe: "to celebrate the birthday of",
           hint: "psst\u2026 try the konami code \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192 B A",
-          secretUnlocked: "You found the sombrero secret!",
+          secretUnlocked: "The macaw sang your name!",
         };
 
   const handleSombrero = () => {
@@ -111,7 +111,7 @@ export default function Chapter6Epilogue() {
           </p>
         </motion.div>
 
-        {/* Interactive Sombrero easter egg */}
+        {/* Interactive Macaw easter egg */}
         <motion.button
           onClick={handleSombrero}
           whileTap={{ scale: 0.9 }}
@@ -122,10 +122,10 @@ export default function Chapter6Epilogue() {
           }
           transition={{ duration: 1 }}
           className="mt-12 text-6xl transition-transform hover:scale-110 cursor-pointer select-none"
-          title="🎩"
-          aria-label="Sombrero"
+          title="🦜"
+          aria-label="Guacamaya"
         >
-          🎩
+          🦜
         </motion.button>
 
         {secretUnlocked && (

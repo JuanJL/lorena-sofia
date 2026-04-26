@@ -2,44 +2,28 @@
 
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/translations";
 import ChapterHeader from "./ChapterHeader";
 
 export default function Chapter2Story() {
   const { lang } = useLanguage();
+
   const copy =
     lang === "es"
       ? {
           number: "Cap\u00EDtulo II",
-          title: "La Historia",
-          subtitle: "lo que el coraz\u00F3n quiere decir",
-          lines: [
-            "Un d\u00EDa para celebrar",
-            "todo lo vivido,",
-            "todo lo que somos",
-            "y todo lo que est\u00E1 por venir.",
-            "",
-            "Ritmo, ra\u00EDces y alegr\u00EDa",
-            "se encuentran para dar inicio",
-            "a lo extraordinario.",
-          ],
+          title: "Mi Historia",
+          subtitle: "de d\u00F3nde vengo",
           signature: "\u2014 Lorena Sof\u00EDa",
         }
       : {
           number: "Chapter II",
-          title: "The Tale",
-          subtitle: "what the heart wants to say",
-          lines: [
-            "A day to celebrate",
-            "everything we\u2019ve lived,",
-            "everything we are",
-            "and everything that\u2019s yet to come.",
-            "",
-            "Rhythm, roots, and joy",
-            "come together to mark the beginning",
-            "of something extraordinary.",
-          ],
+          title: "My Story",
+          subtitle: "where I come from",
           signature: "\u2014 Lorena Sof\u00EDa",
         };
+
+  const paragraphs = translations[lang].story.paragraphs;
 
   return (
     <section
@@ -81,10 +65,10 @@ export default function Chapter2Story() {
           subtitle={copy.subtitle}
         />
 
-        {/* Paper scroll with lines revealing one by one */}
+        {/* Paper scroll with the personal letter */}
         <div className="relative mt-16">
           <div className="paper-texture polaroid-shadow mx-auto rounded-sm border border-gold/20 p-8 md:p-14">
-            {/* Ornament */}
+            {/* Top ornament */}
             <div className="mb-8 flex items-center justify-center gap-3">
               <div className="h-px w-12 bg-gold/30" />
               <svg width="14" height="14" viewBox="0 0 20 20" className="text-gold">
@@ -96,25 +80,23 @@ export default function Chapter2Story() {
               <div className="h-px w-12 bg-gold/30" />
             </div>
 
-            <div className="space-y-3">
-              {copy.lines.map((line, i) => (
+            <div className="space-y-7 md:space-y-9">
+              {paragraphs.map((p, i) => (
                 <motion.p
                   key={i}
-                  initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, y: 14, filter: "blur(3px)" }}
                   whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.15 }}
                   transition={{
-                    duration: 0.8,
+                    duration: 0.9,
                     delay: 0.2 + i * 0.35,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className={`text-center font-heading leading-relaxed italic ${
-                    line === ""
-                      ? "h-4"
-                      : "text-xl text-ink md:text-2xl"
+                  className={`font-heading text-base leading-relaxed text-ink md:text-lg ${
+                    i === 0 ? "indent-6" : ""
                   }`}
                 >
-                  {line || "\u00A0"}
+                  {p}
                 </motion.p>
               ))}
             </div>
@@ -124,7 +106,7 @@ export default function Chapter2Story() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 3.5 }}
+              transition={{ duration: 1, delay: 1.4 }}
               className="mt-10 text-right font-hand text-2xl text-rose-deep md:text-3xl"
             >
               {copy.signature}

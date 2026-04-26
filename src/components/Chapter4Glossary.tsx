@@ -14,13 +14,16 @@ export default function Chapter4Glossary() {
           title: "El Mundo de Lorena",
           subtitle:
             "un tablero m\u00E1gico de ra\u00EDces colombianas",
-          hint: "Toca para voltear \u00B7 Arrastra para mover",
+          hint:
+            "Haz clic en cualquier foto para descubrir su historia",
+          subhint: "Tambi\u00E9n puedes arrastrarlas por el tablero",
         }
       : {
           number: "Chapter IV",
           title: "Lorena's World",
           subtitle: "a magical board of Colombian roots",
-          hint: "Tap to flip \u00B7 Drag to move",
+          hint: "Click any photo to discover its story",
+          subhint: "You can also drag them around the board",
         };
 
   // Deterministic pseudo-random rotation for each item
@@ -49,9 +52,29 @@ export default function Chapter4Glossary() {
           subtitle={copy.subtitle}
         />
 
-        <p className="mt-6 text-center font-hand text-lg text-rose-deep md:text-xl">
-          {copy.hint}
-        </p>
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/60 px-4 py-2 backdrop-blur-sm">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-gold-deep"
+            >
+              <path d="M9 11.5 L9 4 a1.5 1.5 0 0 1 3 0 L12 12 L13 9 a1.5 1.5 0 0 1 3 0 L16 13 L17 11 a1.5 1.5 0 0 1 3 0 L20 14 a6 6 0 0 1 -10 4 L7 14 a1.5 1.5 0 0 1 2 -2 z" />
+            </svg>
+            <p className="font-hand text-base text-rose-deep md:text-lg">
+              {copy.hint}
+            </p>
+          </div>
+          <p className="text-xs tracking-wider text-warm-gray italic md:text-sm">
+            {copy.subhint}
+          </p>
+        </div>
 
         {/* Polaroid grid */}
         <div className="mt-16 grid grid-cols-2 place-items-center gap-6 sm:grid-cols-3 md:gap-10 lg:grid-cols-4 lg:gap-12 xl:grid-cols-5">

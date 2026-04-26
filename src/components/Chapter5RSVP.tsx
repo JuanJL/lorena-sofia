@@ -67,7 +67,6 @@ export default function Chapter5RSVP() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    guests: "1",
     attendance: "",
     message: "",
   });
@@ -143,7 +142,7 @@ export default function Chapter5RSVP() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          guests: Number(formData.guests),
+          guests: 1,
           attendance: formData.attendance,
           message: formData.message,
         }),
@@ -295,39 +294,18 @@ export default function Chapter5RSVP() {
                 />
               </div>
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-1 block font-hand text-lg text-rose-deep">
-                    {copy.emailLabel}
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, email: e.target.value }))
-                    }
-                    className="w-full border-b border-warm-dark/30 bg-transparent px-1 py-2 text-warm-dark focus:border-gold focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 block font-hand text-lg text-rose-deep">
-                    {copy.guestsLabel}
-                  </label>
-                  <select
-                    value={formData.guests}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, guests: e.target.value }))
-                    }
-                    className="w-full border-b border-warm-dark/30 bg-transparent px-1 py-2 text-warm-dark focus:border-gold focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {copy.guestUnit(n)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="mb-1 block font-hand text-lg text-rose-deep">
+                  {copy.emailLabel}
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, email: e.target.value }))
+                  }
+                  className="w-full border-b border-warm-dark/30 bg-transparent px-1 py-2 text-warm-dark focus:border-gold focus:outline-none"
+                />
               </div>
 
               {/* Attendance */}

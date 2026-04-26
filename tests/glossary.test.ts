@@ -2,8 +2,19 @@ import { describe, it, expect } from "vitest";
 import { glossaryItems } from "@/lib/glossary";
 
 describe("glossaryItems data", () => {
-  it("contains 21 entries (the full Colombian culture set)", () => {
-    expect(glossaryItems).toHaveLength(21);
+  it("contains the full Colombian culture set (22 entries)", () => {
+    expect(glossaryItems).toHaveLength(22);
+  });
+
+  it("includes Marimonda (replaced Monocuco)", () => {
+    const ids = glossaryItems.map((i) => i.id);
+    expect(ids).toContain("marimonda");
+    expect(ids).not.toContain("monocuco");
+  });
+
+  it("includes the new Selecci\u00F3n Colombia card", () => {
+    const ids = glossaryItems.map((i) => i.id);
+    expect(ids).toContain("seleccion-colombia");
   });
 
   it("every item has a unique id", () => {

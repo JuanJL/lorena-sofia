@@ -25,18 +25,18 @@ export const glossaryItems: GlossaryItem[] = [
     },
   },
   {
-    id: "monocuco",
-    image: "/glossary/monocuco.jpg",
-    emoji: "\uD83C\uDFAA",
+    id: "marimonda",
+    image: "/glossary/marimonda.jpg",
+    emoji: "\uD83D\uDC12",
     es: {
-      name: "Monocuco",
+      name: "Marimonda",
       description:
-        "Personaje ic\u00F3nico del Carnaval de Barranquilla. Viste un traje colorido de rayas con capucha que cubre todo el cuerpo y una m\u00E1scara, permiti\u00E9ndole bailar y bromear de forma an\u00F3nima.",
+        "Personaje m\u00E1s ir\u00F3nico y travieso del Carnaval de Barranquilla. Lleva una m\u00E1scara con orejas grandes y una larga nariz tipo trompa, junto a un traje colorido de rayas. Naci\u00F3 como burla a la \u2018gente bien\u2019 y hoy es s\u00EDmbolo de humor, libertad y crítica social.",
     },
     en: {
-      name: "Monocuco",
+      name: "Marimonda",
       description:
-        "Iconic character of the Barranquilla Carnival. Wears a colorful striped costume with a hood covering the entire body and a mask, allowing anonymous dancing and joking.",
+        "The most ironic and mischievous character of the Barranquilla Carnival. Wears a mask with big floppy ears and a long trunk-like nose, along with a colorful striped suit. Born as a satire of the upper class, today it stands for humor, freedom, and social commentary.",
     },
   },
   {
@@ -166,12 +166,27 @@ export const glossaryItems: GlossaryItem[] = [
     es: {
       name: "Junior de Barranquilla",
       description:
-        "Club de f\u00FAtbol m\u00E1s querido de Barranquilla. Con sus colores rojo y blanco, el \u2018Tibur\u00F3n\u2019 es la pasi\u00F3n de toda una ciudad y s\u00EDmbolo de la identidad barranquillera.",
+        "Club de f\u00FAtbol m\u00E1s querido de Barranquilla. Con sus colores rojo y blanco, el \u2018Tibur\u00F3n\u2019 es la pasi\u00F3n de toda una ciudad y cantera de muchos jugadores que han vestido la camiseta de la Selecci\u00F3n Colombia.",
     },
     en: {
       name: "Junior de Barranquilla",
       description:
-        "Barranquilla\u2019s most beloved football club. With its red and white colors, \u2018El Tibur\u00F3n\u2019 (The Shark) is the passion of an entire city and symbol of Barranquilla identity.",
+        "Barranquilla\u2019s most beloved football club. With its red and white colors, \u2018El Tibur\u00F3n\u2019 (The Shark) is the passion of an entire city and a nursery for many players who have worn the Colombia national team jersey.",
+    },
+  },
+  {
+    id: "seleccion-colombia",
+    image: "/glossary/seleccion-colombia.jpg",
+    emoji: "\u26BD\uFE0F",
+    es: {
+      name: "Selecci\u00F3n Colombia",
+      description:
+        "La tricolor amarillo, azul y rojo que une a todo un pa\u00EDs cada vez que juega. En 2026 vuelve a la Copa Mundial de la FIFA \u2014 justo en el a\u00F1o de esta celebraci\u00F3n.",
+    },
+    en: {
+      name: "Colombia National Team",
+      description:
+        "The yellow, blue, and red tricolor that unites the whole country every time it plays. In 2026 they return to the FIFA World Cup \u2014 the very year of this celebration.",
     },
   },
   {

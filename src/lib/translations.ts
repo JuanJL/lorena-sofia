@@ -7,14 +7,11 @@ export const translations = {
       subtitle: "COMIENZA UNA NUEVA ERA",
     },
     story: {
-      line1:
-        "Un d\u00EDa para celebrar todo lo vivido,",
-      line2: "todo lo que somos",
-      line3: "y todo lo que est\u00E1 por venir.",
-      line4:
-        "Ritmo, ra\u00EDces y alegr\u00EDa",
-      line5: "se encuentran para dar inicio",
-      line6: "a lo extraordinario.",
+      paragraphs: [
+        "Nac\u00ED el 3 de junio de 1986 en Valledupar, al norte de Colombia, hija de mis hermosos padres, Carlos y Rosalba. Con mi llegada, se cerraba nuestro hogar en una familia de cinco, junto a mis dos hermanos mayores, Jimmy y Mauro.",
+        "Crec\u00ED en una tierra donde el calor no solo se siente en la piel, sino tambi\u00E9n en el coraz\u00F3n. El norte de Colombia es m\u00FAsica, es tradici\u00F3n, es vida que se celebra sin medida. Es el sonido del vallenato contando historias, las reuniones llenas de risas, los colores, los abrazos largos y la cercan\u00EDa de la gente.",
+        "Vengo de un lugar donde la alegr\u00EDa es esencia, donde las ra\u00EDces son profundas y donde el amor por la vida se respira en cada detalle. Esa energ\u00EDa, esa calidez y esa forma de sentir el mundo viven en m\u00ED\u2026 y son parte de todo lo que soy hoy.",
+      ],
     },
     details: {
       title: "Detalles del Evento",
@@ -69,12 +66,11 @@ export const translations = {
       subtitle: "A NEW ERA BEGINS",
     },
     story: {
-      line1: "A day to celebrate everything we\u2019ve lived,",
-      line2: "everything we are",
-      line3: "and everything that\u2019s yet to come.",
-      line4: "Rhythm, roots, and joy",
-      line5: "come together to mark the beginning",
-      line6: "of something extraordinary.",
+      paragraphs: [
+        "I was born on June 3, 1986 in Valledupar, in the north of Colombia, the daughter of my beautiful parents, Carlos and Rosalba. With my arrival, our home became complete \u2014 a family of five, alongside my two older brothers, Jimmy and Mauro.",
+        "I grew up in a land where warmth is felt not only on the skin, but also in the heart. The north of Colombia is music, it is tradition, it is life celebrated without measure. It is the sound of vallenato telling stories, gatherings full of laughter, colors, long hugs, and the closeness of its people.",
+        "I come from a place where joy is essence, where roots run deep, and where love for life breathes in every detail. That energy, that warmth, and that way of feeling the world live in me\u2026 and are part of everything I am today.",
+      ],
     },
     details: {
       title: "Event Details",

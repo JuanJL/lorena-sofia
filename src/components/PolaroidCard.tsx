@@ -119,9 +119,25 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
               <p className="font-hand text-lg leading-tight text-warm-dark md:text-xl">
                 {data.name}
               </p>
-              <p className="mt-1 text-[9px] font-medium tracking-[0.3em] text-gold uppercase">
-                {lang === "es" ? "Da la vuelta" : "Flip me"}
-              </p>
+            </div>
+
+            {/* Subtle click affordance — top-right corner */}
+            <div
+              className="pointer-events-none absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/85 text-gold-deep shadow-sm ring-1 ring-gold/30 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-0"
+              aria-hidden="true"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 11.5 L9 4 a1.5 1.5 0 0 1 3 0 L12 12 L13 9 a1.5 1.5 0 0 1 3 0 L16 13 L17 11 a1.5 1.5 0 0 1 3 0 L20 14 a6 6 0 0 1 -10 4 L7 14 a1.5 1.5 0 0 1 2 -2 z" />
+              </svg>
             </div>
           </div>
         </div>
