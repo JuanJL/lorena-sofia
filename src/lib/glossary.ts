@@ -160,21 +160,6 @@ export const glossaryItems: GlossaryItem[] = [
     },
   },
   {
-    id: "junior",
-    image: "/glossary/junior.jpg",
-    emoji: "\uD83C\uDFDF\uFE0F",
-    es: {
-      name: "Junior de Barranquilla",
-      description:
-        "Club de f\u00FAtbol m\u00E1s querido de Barranquilla. Con sus colores rojo y blanco, el \u2018Tibur\u00F3n\u2019 es la pasi\u00F3n de toda una ciudad y cantera de muchos jugadores que han vestido la camiseta de la Selecci\u00F3n Colombia.",
-    },
-    en: {
-      name: "Junior de Barranquilla",
-      description:
-        "Barranquilla\u2019s most beloved football club. With its red and white colors, \u2018El Tibur\u00F3n\u2019 (The Shark) is the passion of an entire city and a nursery for many players who have worn the Colombia national team jersey.",
-    },
-  },
-  {
     id: "seleccion-colombia",
     image: "/glossary/seleccion-colombia.jpg",
     emoji: "\u26BD\uFE0F",

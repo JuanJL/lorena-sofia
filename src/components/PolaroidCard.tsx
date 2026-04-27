@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useState } from "react";
+import { motion, useMotionValue, useSpring, type PanInfo } from "framer-motion";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { GlossaryItem } from "@/lib/glossary";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,6 +11,8 @@ interface Props {
   index: number;
   rotation: number;
 }
+
+const DRAG_THRESHOLD_PX = 8;
 
 export default function PolaroidCard({ item, index, rotation }: Props) {
   const { lang } = useLanguage();
@@ -22,6 +24,9 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
   const y = useMotionValue(0);
   const rotX = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 });
+
+  // Track whether the most recent pointer interaction was a real drag
+  const wasDraggingRef = useRef(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -36,12 +41,34 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
     rotY.set(0);
   };
 
-  const tapeColors = [
-    "washi-tape",
-    "washi-tape washi-tape-gold",
-  ];
+  const handleDragStart = () => {
+    wasDraggingRef.current = false;
+  };
+
+  const handleDrag = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    if (
+      Math.abs(info.offset.x) > DRAG_THRESHOLD_PX ||
+      Math.abs(info.offset.y) > DRAG_THRESHOLD_PX
+    ) {
+      wasDraggingRef.current = true;
+    }
+  };
+
+  const handleClick = () => {
+    if (wasDraggingRef.current) {
+      // user was dragging — don't flip
+      wasDraggingRef.current = false;
+      return;
+    }
+    setFlipped((prev) => !prev);
+  };
+
+  const tapeColors = ["washi-tape", "washi-tape washi-tape-gold"];
   const tapeIdx = index % tapeColors.length;
-  const tapeRot = (index * 37) % 18 - 9;
+  const tapeRot = ((index * 37) % 18) - 9;
+
+  const flipHint =
+    lang === "es" ? "Toca para leer la historia" : "Tap to read the story";
 
   return (
     <motion.div
@@ -55,9 +82,12 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
       }}
       drag
       dragElastic={0.15}
-      dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
+      dragSnapToOrigin
+      dragTransition={{ bounceStiffness: 280, bounceDamping: 22 }}
       whileDrag={{ scale: 1.05, zIndex: 40, cursor: "grabbing" }}
       whileHover={{ y: -6, zIndex: 30 }}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
       style={{
         x,
         y,
@@ -67,13 +97,18 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onClick={(e) => {
-        // avoid flip while dragging
-        if (Math.abs(x.get()) < 3 && Math.abs(y.get()) < 3) {
-          setFlipped(!flipped);
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped((prev) => !prev);
         }
       }}
-      className="group relative cursor-grab active:cursor-grabbing"
+      aria-label={`${data.name} — ${flipHint}`}
+      aria-pressed={flipped}
+      className="group relative cursor-pointer touch-none select-none active:cursor-grabbing"
     >
       {/* Washi tape */}
       <div
@@ -89,17 +124,17 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{ transformStyle: "preserve-3d" }}
-        className="relative h-[280px] w-[200px] md:h-[320px] md:w-[230px]"
+        className="relative h-[300px] w-[210px] md:h-[340px] md:w-[240px]"
       >
         {/* Front */}
         <div
           className="polaroid-shadow polaroid-face absolute inset-0 rounded-sm bg-white p-3 pb-8"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className="flex h-full flex-col items-center justify-between overflow-hidden bg-gradient-to-br from-cream-dark via-paper to-rose-lighter rounded-sm">
-            <div className="relative flex flex-1 w-full items-center justify-center overflow-hidden">
+          <div className="flex h-full flex-col items-center justify-between overflow-hidden rounded-sm bg-gradient-to-br from-cream-dark via-paper to-rose-lighter">
+            <div className="relative flex w-full flex-1 items-center justify-center overflow-hidden">
               {imageError ? (
-                <span className="text-7xl md:text-8xl drop-shadow-md">
+                <span className="text-7xl drop-shadow-md md:text-8xl">
                   {item.emoji}
                 </span>
               ) : (
@@ -107,7 +142,7 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
                   src={item.image}
                   alt={data.name}
                   fill
-                  sizes="(max-width: 768px) 200px, 230px"
+                  sizes="(max-width: 768px) 210px, 240px"
                   className="glossary-photo object-cover"
                   onError={() => setImageError(true)}
                 />
@@ -121,9 +156,9 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
               </p>
             </div>
 
-            {/* Subtle click affordance — top-right corner */}
+            {/* Click affordance — top-right corner */}
             <div
-              className="pointer-events-none absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/85 text-gold-deep shadow-sm ring-1 ring-gold/30 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-0"
+              className="pointer-events-none absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gold-deep shadow-sm ring-1 ring-gold/40 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-0"
               aria-hidden="true"
             >
               <svg
@@ -132,7 +167,7 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.6"
+                strokeWidth="1.7"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -151,14 +186,14 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
           }}
         >
           <div className="flex h-full flex-col">
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-3 flex items-center gap-2">
               <span className="text-2xl">{item.emoji}</span>
-              <p className="font-heading text-sm text-warm-dark leading-tight">
+              <p className="font-heading text-base leading-tight text-warm-dark md:text-lg">
                 {data.name}
               </p>
             </div>
             <div className="h-px w-full bg-gold/40" />
-            <p className="mt-3 text-xs leading-relaxed text-warm-gray md:text-[13px]">
+            <p className="mt-3 overflow-y-auto text-sm leading-relaxed text-warm-dark/85 md:text-[15px]">
               {data.description}
             </p>
           </div>
