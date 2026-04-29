@@ -1,32 +1,11 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
 import { NextResponse } from "next/server";
+import { addRSVP, getAllRSVPs, type RSVP } from "@/lib/rsvp-store";
 
-const DATA_FILE = join(process.cwd(), "data", "rsvps.json");
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "lorena2026";
 
-interface RSVP {
-  id: string;
-  name: string;
-  email?: string;
-  guests: number;
-  attendance: "yes" | "no" | "maybe";
-  message?: string;
-  timestamp: string;
-}
-
-function getRSVPs(): RSVP[] {
-  try {
-    if (!existsSync(DATA_FILE)) return [];
-    return JSON.parse(readFileSync(DATA_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
-}
-
-function saveRSVPs(rsvps: RSVP[]) {
-  writeFileSync(DATA_FILE, JSON.stringify(rsvps, null, 2));
-}
+// Force the route onto the Node.js runtime so @vercel/kv works on Vercel
+// (the edge runtime doesn't ship the same redis client APIs).
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -35,29 +14,28 @@ export async function POST(request: Request) {
     if (!body.name || !body.attendance) {
       return NextResponse.json(
         { error: "Name and attendance are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const rsvps = getRSVPs();
     const newRSVP: RSVP = {
       id: crypto.randomUUID(),
-      name: body.name.trim(),
-      email: body.email?.trim() || undefined,
+      name: String(body.name).trim(),
+      email: body.email ? String(body.email).trim() : undefined,
       guests: Math.min(Math.max(Number(body.guests) || 1, 1), 5),
       attendance: body.attendance,
-      message: body.message?.trim() || undefined,
+      message: body.message ? String(body.message).trim() : undefined,
       timestamp: new Date().toISOString(),
     };
 
-    rsvps.push(newRSVP);
-    saveRSVPs(rsvps);
+    await addRSVP(newRSVP);
 
     return NextResponse.json({ success: true, id: newRSVP.id });
-  } catch {
+  } catch (err) {
+    console.error("RSVP POST failed", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,7 +48,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rsvps = getRSVPs();
+  const rsvps = await getAllRSVPs();
 
   const stats = {
     total: rsvps.length,
