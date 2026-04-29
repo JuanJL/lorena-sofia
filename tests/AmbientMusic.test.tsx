@@ -1,60 +1,101 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import AmbientMusic from "@/components/AmbientMusic";
 import { LanguageProvider } from "@/context/LanguageContext";
-
-const SPOTIFY_TRACK_ID = "1dHbcmMm9bov1q4lG7Q4nQ";
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(<LanguageProvider>{ui}</LanguageProvider>);
 }
 
+beforeEach(() => {
+  // jsdom doesn't implement HTMLMediaElement.play/pause meaningfully; stub them.
+  Object.defineProperty(window.HTMLMediaElement.prototype, "play", {
+    configurable: true,
+    value: vi.fn().mockResolvedValue(undefined),
+  });
+  Object.defineProperty(window.HTMLMediaElement.prototype, "pause", {
+    configurable: true,
+    value: vi.fn(),
+  });
+});
+
 describe("AmbientMusic", () => {
-  it("renders a music toggle button", () => {
+  it("renders an open-player toggle button", () => {
     renderWithProviders(<AmbientMusic />);
-    const toggle = screen.getByRole("button", { name: /music|m\u00FAsica/i });
+    const toggle = screen.getByRole("button", {
+      name: /open player|abrir reproductor/i,
+    });
     expect(toggle).toBeInTheDocument();
   });
 
-  it("hides the Spotify embed by default", () => {
+  it("renders an HTML5 audio element pointing at the local MP3", () => {
+    const { container } = renderWithProviders(<AmbientMusic />);
+    const audio = container.querySelector("audio");
+    expect(audio).not.toBeNull();
+    expect(audio?.getAttribute("src")).toBe("/audio/algo-tu.mp3");
+  });
+
+  it("does NOT embed a Spotify or YouTube iframe", () => {
     renderWithProviders(<AmbientMusic />);
     expect(screen.queryByTitle(/spotify/i)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/youtube/i)).not.toBeInTheDocument();
   });
 
-  it("reveals the Spotify embed when the toggle is clicked", async () => {
+  it("hides the mini player by default", () => {
+    renderWithProviders(<AmbientMusic />);
+    expect(
+      screen.queryByRole("region", { name: /music player/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("opens the mini player when the toggle is clicked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AmbientMusic />);
-    await user.click(screen.getByRole("button", { name: /music|m\u00FAsica/i }));
-    const iframe = screen.getByTitle(/spotify/i) as HTMLIFrameElement;
-    expect(iframe).toBeInTheDocument();
-    expect(iframe.src).toContain(`embed/track/${SPOTIFY_TRACK_ID}`);
-  });
-
-  it("hides the embed again when toggled twice", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<AmbientMusic />);
-    const toggle = screen.getByRole("button", { name: /music|m\u00FAsica/i });
-    await user.click(toggle);
-    await user.click(toggle);
-    expect(screen.queryByTitle(/spotify/i)).not.toBeInTheDocument();
-  });
-
-  it("uses an accessible aria-label that mentions the soundtrack", () => {
-    renderWithProviders(<AmbientMusic />);
-    const toggle = screen.getByRole("button");
-    expect(toggle).toHaveAttribute("aria-label");
-    expect(toggle.getAttribute("aria-label")?.toLowerCase()).toMatch(
-      /music|m\u00FAsica|soundtrack|banda/i,
+    await user.click(
+      screen.getByRole("button", { name: /open player|abrir reproductor/i }),
     );
+    expect(
+      screen.getByRole("region", { name: /music player/i }),
+    ).toBeInTheDocument();
   });
 
-  it("decorates the toggle with a music icon (svg or text)", () => {
+  it("shows the track title and artist in the mini player", async () => {
+    const user = userEvent.setup();
     renderWithProviders(<AmbientMusic />);
-    const toggle = screen.getByRole("button");
-    // Either has an svg child or visible text
-    const hasSvg = within(toggle).queryAllByRole("img", { hidden: true }).length > 0
-      || toggle.querySelector("svg") !== null;
-    expect(hasSvg).toBe(true);
+    await user.click(
+      screen.getByRole("button", { name: /open player|abrir reproductor/i }),
+    );
+    expect(screen.getByText(/ALGO T\u00DA/)).toBeInTheDocument();
+    expect(screen.getByText(/Shakira.*Be\u00E9le/i)).toBeInTheDocument();
+  });
+
+  it("includes a play button inside the mini player", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AmbientMusic />);
+    await user.click(
+      screen.getByRole("button", { name: /open player|abrir reproductor/i }),
+    );
+    const playBtn = screen.getByRole("button", {
+      name: /play|reproducir/i,
+    });
+    expect(playBtn).toBeInTheDocument();
+  });
+
+  it("calls audio.play when the play button is clicked", async () => {
+    const user = userEvent.setup();
+    const playSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(window.HTMLMediaElement.prototype, "play", {
+      configurable: true,
+      value: playSpy,
+    });
+    renderWithProviders(<AmbientMusic />);
+    await user.click(
+      screen.getByRole("button", { name: /open player|abrir reproductor/i }),
+    );
+    // play might already be called once on open, then again on the play button
+    const playBtn = screen.getByRole("button", { name: /play|reproducir/i });
+    await user.click(playBtn);
+    expect(playSpy).toHaveBeenCalled();
   });
 });
