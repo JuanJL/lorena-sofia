@@ -28,7 +28,24 @@ export default function BookCoverHero() {
       ref={ref}
       className="relative h-screen w-full overflow-hidden bg-ink"
     >
-      {/* Poster with subtle parallax */}
+      {/* Blurred backdrop fills the side gaps on desktop so the poster
+          can be shown in full without cropping. Hidden on mobile/tablet
+          where the image fills the viewport via object-cover anyway. */}
+      <div className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block">
+        <Image
+          src="/poster.jpg"
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
+          className="scale-110 object-cover blur-2xl brightness-90 saturate-110"
+        />
+        <div className="absolute inset-0 bg-ink/25" />
+      </div>
+
+      {/* Poster — fills the viewport on mobile (object-cover), shown
+          fully on desktop without cropping (object-contain). */}
       <motion.div
         style={{ scale: posterScale, y: posterY }}
         className="absolute inset-0 h-full w-full"
@@ -39,7 +56,7 @@ export default function BookCoverHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover animate-breathe"
+          className="animate-breathe object-cover lg:object-contain"
         />
       </motion.div>
 
