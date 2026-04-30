@@ -98,4 +98,27 @@ describe("AmbientMusic", () => {
     await user.click(playBtn);
     expect(playSpy).toHaveBeenCalled();
   });
+
+  it("seeks the playhead to 2:26 once the duration is known", async () => {
+    const { container } = renderWithProviders(<AmbientMusic />);
+    const audio = container.querySelector("audio") as HTMLAudioElement & {
+      _ct?: number;
+    };
+    // Fake a real song duration the same way the browser would once
+    // metadata loads: it's a getter, so override the prototype.
+    Object.defineProperty(audio, "duration", {
+      configurable: true,
+      get: () => 226.59,
+    });
+    let stored = 0;
+    Object.defineProperty(audio, "currentTime", {
+      configurable: true,
+      get: () => stored,
+      set: (v: number) => {
+        stored = v;
+      },
+    });
+    audio.dispatchEvent(new Event("loadedmetadata"));
+    expect(stored).toBe(2 * 60 + 26);
+  });
 });

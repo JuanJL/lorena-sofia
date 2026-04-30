@@ -6,6 +6,10 @@ import { useLanguage } from "@/context/LanguageContext";
 const AUDIO_SRC = "/audio/algo-tu.mp3";
 const TRACK_TITLE = "ALGO T\u00DA";
 const TRACK_ARTIST = "Shakira \u00D7 Be\u00E9le";
+// Skip the intro — start the song at this point on first load and on
+// natural end-of-track playback. Seekbar still lets the user scrub
+// anywhere in the full track.
+const START_AT_SECONDS = 2 * 60 + 26; // 2:26
 
 function formatTime(s: number): string {
   if (!isFinite(s) || s < 0) return "0:00";
@@ -16,6 +20,8 @@ function formatTime(s: number): string {
 
 export default function AmbientMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const seededRef = useRef(false);
+  const firstOpenRef = useRef(true);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -30,11 +36,25 @@ export default function AmbientMusic() {
     const onDuration = () => {
       if (isFinite(audio.duration) && audio.duration > 0) {
         setDuration(audio.duration);
+        // First time we know the song length: jump the playhead forward
+        // to the requested starting point so 'play' begins at 2:26 rather
+        // than from the very beginning.
+        if (
+          !seededRef.current &&
+          audio.currentTime < 1 &&
+          audio.duration > START_AT_SECONDS
+        ) {
+          audio.currentTime = START_AT_SECONDS;
+          setCurrentTime(START_AT_SECONDS);
+          seededRef.current = true;
+        }
       }
     };
     const onEnded = () => {
       setPlaying(false);
-      setCurrentTime(0);
+      // Reset to the same starting point so a second play picks up at 2:26.
+      audio.currentTime = START_AT_SECONDS;
+      setCurrentTime(START_AT_SECONDS);
     };
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
@@ -87,7 +107,8 @@ export default function AmbientMusic() {
     const willOpen = !open;
     setOpen(willOpen);
     // Convenience: opening the player for the first time also starts playback
-    if (willOpen && audioRef.current?.paused && currentTime === 0) {
+    if (willOpen && firstOpenRef.current && audioRef.current?.paused) {
+      firstOpenRef.current = false;
       try {
         await audioRef.current.play();
       } catch {
