@@ -4,7 +4,8 @@ import Chapter2Story from "@/components/Chapter2Story";
 import Chapter3Details from "@/components/Chapter3Details";
 import Chapter4Glossary from "@/components/Chapter4Glossary";
 import Chapter5RSVP from "@/components/Chapter5RSVP";
-import Chapter6Epilogue from "@/components/Chapter6Epilogue";
+import Chapter6SummerPastel from "@/components/Chapter6SummerPastel";
+import Chapter7Epilogue from "@/components/Chapter7Epilogue";
 
 export default function Home() {
   return (
@@ -15,7 +16,8 @@ export default function Home() {
       <Chapter3Details />
       <Chapter4Glossary />
       <Chapter5RSVP />
-      <Chapter6Epilogue />
+      <Chapter6SummerPastel />
+      <Chapter7Epilogue />
     </main>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import confetti from "canvas-confetti";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function Chapter6Epilogue() {
+export default function Chapter7Epilogue() {
   const { lang } = useLanguage();
   const [sombreroClicks, setSombreroClicks] = useState(0);
   const [secretUnlocked, setSecretUnlocked] = useState(false);
@@ -13,7 +13,7 @@ export default function Chapter6Epilogue() {
   const copy =
     lang === "es"
       ? {
-          number: "Cap\u00EDtulo VI",
+          number: "Cap\u00EDtulo VII",
           title: "Hasta pronto",
           line1: "Y as\u00ED termina este cap\u00EDtulo\u2026",
           line2: "pero el cuento",
@@ -26,7 +26,7 @@ export default function Chapter6Epilogue() {
           secretUnlocked: "\u00A1La guacamaya cant\u00F3 tu nombre!",
         }
       : {
-          number: "Chapter VI",
+          number: "Chapter VII",
           title: "See you soon",
           line1: "And so ends this chapter\u2026",
           line2: "but the tale",

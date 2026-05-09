@@ -323,6 +323,21 @@ input:focus, select:focus, textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
 
+/* Thin scrollbar for the polaroid back side */
+.glossary-back-scroll::-webkit-scrollbar { width: 4px; }
+.glossary-back-scroll::-webkit-scrollbar-track { background: transparent; }
+.glossary-back-scroll::-webkit-scrollbar-thumb {
+  background: rgba(197, 165, 90, 0.45);
+  border-radius: 2px;
+}
+.glossary-back-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 165, 90, 0.7);
+}
+.glossary-back-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(197, 165, 90, 0.45) transparent;
+}
+
 /* Book cover shadow */
 .book-cover-shadow {
   box-shadow:

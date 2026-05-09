@@ -16,14 +16,12 @@ export default function Chapter4Glossary() {
             "un tablero m\u00E1gico de ra\u00EDces colombianas",
           hint:
             "Haz clic en cualquier foto para descubrir su historia",
-          subhint: "Tambi\u00E9n puedes arrastrarlas por el tablero",
         }
       : {
           number: "Chapter IV",
           title: "Lorena's World",
           subtitle: "a magical board of Colombian roots",
           hint: "Click any photo to discover its story",
-          subhint: "You can also drag them around the board",
         };
 
   // Deterministic pseudo-random rotation for each item
@@ -71,9 +69,6 @@ export default function Chapter4Glossary() {
               {copy.hint}
             </p>
           </div>
-          <p className="text-xs tracking-wider text-warm-gray italic md:text-sm">
-            {copy.subhint}
-          </p>
         </div>
 
         {/* Polaroid grid */}

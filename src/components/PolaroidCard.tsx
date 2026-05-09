@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  type PanInfo,
-} from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { GlossaryItem } from "@/lib/glossary";
 import { useLanguage } from "@/context/LanguageContext";
@@ -17,10 +12,6 @@ interface Props {
   rotation: number;
 }
 
-// How far the user must drag before we consider it a real drag (and suppress
-// the flip on release). Bigger = more forgiving on touch devices.
-const DRAG_THRESHOLD_PX = 14;
-
 export default function PolaroidCard({ item, index, rotation }: Props) {
   const { lang } = useLanguage();
   const data = item[lang];
@@ -28,17 +19,11 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
   const [imageError, setImageError] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  // Subtle 3D tilt on desktop hover
   const rotX = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 });
 
-  // Track whether the most recent pointer interaction was a real drag
-  const wasDraggingRef = useRef(false);
-
   useEffect(() => {
-    // Detect coarse pointer (touch) once on mount so we can disable the
-    // mouse-driven 3D tilt — on touch it produces flicker without benefit.
     if (typeof window !== "undefined" && window.matchMedia) {
       setIsTouch(window.matchMedia("(pointer: coarse)").matches);
     }
@@ -49,8 +34,8 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
     const rect = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    rotY.set(px * 14);
-    rotX.set(-py * 14);
+    rotY.set(px * 10);
+    rotX.set(-py * 10);
   };
 
   const handleMouseLeave = () => {
@@ -58,31 +43,7 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
     rotY.set(0);
   };
 
-  const handleDragStart = () => {
-    wasDraggingRef.current = false;
-  };
-
-  const handleDrag = (
-    _: PointerEvent | MouseEvent | TouchEvent,
-    info: PanInfo,
-  ) => {
-    if (
-      Math.abs(info.offset.x) > DRAG_THRESHOLD_PX ||
-      Math.abs(info.offset.y) > DRAG_THRESHOLD_PX
-    ) {
-      wasDraggingRef.current = true;
-    }
-  };
-
   const toggleFlip = () => setFlipped((prev) => !prev);
-
-  const handleClick = () => {
-    if (wasDraggingRef.current) {
-      wasDraggingRef.current = false;
-      return;
-    }
-    toggleFlip();
-  };
 
   const tapeColors = ["washi-tape", "washi-tape washi-tape-gold"];
   const tapeIdx = index % tapeColors.length;
@@ -102,24 +63,15 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
         delay: (index % 6) * 0.08,
         ease: [0.22, 1, 0.36, 1],
       }}
-      drag
-      dragElastic={0.15}
-      dragSnapToOrigin
-      dragTransition={{ bounceStiffness: 280, bounceDamping: 22 }}
-      whileDrag={{ scale: 1.05, zIndex: 40, cursor: "grabbing" }}
       whileHover={{ y: -6, zIndex: 30 }}
-      onDragStart={handleDragStart}
-      onDrag={handleDrag}
       style={{
-        x,
-        y,
         rotateX: rotX,
         rotateY: rotY,
         transformStyle: "preserve-3d",
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
+      onClick={toggleFlip}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -130,7 +82,7 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
       }}
       aria-label={`${data.name} — ${flipHint}`}
       aria-pressed={flipped}
-      className="group relative cursor-pointer touch-none select-none active:cursor-grabbing"
+      className="group relative cursor-pointer select-none"
     >
       {/* Washi tape */}
       <div
@@ -202,30 +154,34 @@ export default function PolaroidCard({ item, index, rotation }: Props) {
 
         {/* Back — the description card */}
         <div
-          className="polaroid-shadow absolute inset-0 flex flex-col rounded-sm bg-paper p-5 pt-5"
+          className="polaroid-shadow absolute inset-0 flex flex-col rounded-sm bg-paper p-4 pt-4"
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
           }}
         >
           {/* Header */}
-          <div className="mb-3 flex items-center gap-2">
-            <span className="text-2xl">{item.emoji}</span>
-            <p className="font-heading text-[17px] leading-tight font-medium text-warm-dark md:text-lg">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-xl">{item.emoji}</span>
+            <p className="font-heading text-[15px] leading-tight font-medium text-warm-dark md:text-base">
               {data.name}
             </p>
           </div>
           <div className="h-px w-full bg-gold/40" />
 
-          {/* Description — bigger, scrollable if very long */}
-          <div className="mt-3 flex-1 overflow-y-auto pr-1">
-            <p className="text-[14px] leading-[1.55] text-warm-dark/90 md:text-[15px]">
-              {data.description}
-            </p>
+          {/* Description — scrollable, with a fade hint at the bottom */}
+          <div className="relative mt-2 flex-1 overflow-hidden">
+            <div className="glossary-back-scroll h-full overflow-y-auto pr-2">
+              <p className="text-[12.5px] leading-[1.5] text-warm-dark/90 md:text-[13.5px]">
+                {data.description}
+              </p>
+            </div>
+            {/* fade-out at the bottom hints there's more text below */}
+            <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-6 bg-gradient-to-t from-paper to-transparent" />
           </div>
 
           {/* Back hint */}
-          <div className="mt-3 flex items-center justify-center gap-1.5 border-t border-gold/20 pt-2">
+          <div className="mt-2 flex items-center justify-center gap-1.5 border-t border-gold/20 pt-2">
             <svg
               width="12"
               height="12"

@@ -34,6 +34,8 @@ export default function Chapter5RSVP() {
           successTitle: "\u00A1NOS VEMOS EN BARCELONA!",
           successMsg:
             "Tu firma ha entrado al cuento. Guarda el 27.06.26 y prep\u00E1rate para bailar.",
+          nextStepLabel: "Tu siguiente paso",
+          nextStepCta: "Descubre el c\u00F3digo de vestimenta",
           guestUnit: (n: number) =>
             n === 1 ? "1 persona" : `${n} personas`,
         }
@@ -60,6 +62,8 @@ export default function Chapter5RSVP() {
           successTitle: "SEE YOU IN BARCELONA!",
           successMsg:
             "Your signature is in the tale. Mark 27.06.26 and get ready to dance.",
+          nextStepLabel: "Your next step",
+          nextStepCta: "Discover the dress code",
           guestUnit: (n: number) =>
             n === 1 ? "1 person" : `${n} people`,
         };
@@ -193,6 +197,40 @@ export default function Chapter5RSVP() {
             <p className="font-hand text-xl text-rose-deep md:text-2xl">
               {copy.successMsg}
             </p>
+
+            {/* Next-step CTA — only for "yes" attendees */}
+            {formData.attendance === "yes" && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.6 }}
+                className="mt-10"
+              >
+                <p className="mb-3 text-[10px] font-medium tracking-[0.4em] text-gold-deep uppercase">
+                  {copy.nextStepLabel}
+                </p>
+                <a
+                  href="#chapter-6"
+                  className="group inline-flex items-center gap-2 rounded-full border border-gold/50 bg-gradient-to-r from-rose-deep to-gold px-6 py-3 font-heading text-sm font-semibold tracking-widest text-white uppercase shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl md:px-8 md:py-4 md:text-base"
+                >
+                  <span>{copy.nextStepCta}</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform group-hover:translate-x-1"
+                  >
+                    <path d="M5 12 H19 M13 6 L19 12 L13 18" />
+                  </svg>
+                </a>
+              </motion.div>
+            )}
+
             <div className="mt-8 text-5xl">🎉</div>
           </motion.div>
         </div>
