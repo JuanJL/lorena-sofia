@@ -10,7 +10,11 @@ afterEach(() => {
 vi.mock("framer-motion", async () => {
   const React = await import("react");
   const handler = {
-    get: () => {
+    get: (_target: unknown, prop: string | symbol) => {
+      // Preserve the underlying HTML tag (motion.button → 'button',
+      // motion.div → 'div', etc.) so semantic role queries in tests work.
+      const tag =
+        typeof prop === "string" && /^[a-z]+$/i.test(prop) ? prop : "div";
       return React.forwardRef(
         (
           { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,
@@ -32,24 +36,21 @@ vi.mock("framer-motion", async () => {
                 "viewport",
                 "drag",
                 "dragElastic",
+                "dragSnapToOrigin",
                 "dragTransition",
                 "layout",
                 "layoutId",
                 "variants",
-                "onMouseMove",
-                "onMouseLeave",
+                "onDragStart",
+                "onDrag",
+                "onDragEnd",
               ].includes(key)
             ) {
               continue;
             }
             safeProps[key] = value;
           }
-          // Default to <div> for forward-ref-able element
-          return React.createElement(
-            "div",
-            { ...safeProps, ref },
-            children,
-          );
+          return React.createElement(tag, { ...safeProps, ref }, children);
         },
       );
     },

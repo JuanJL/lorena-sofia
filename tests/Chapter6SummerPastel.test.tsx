@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import Chapter6SummerPastel from "@/components/Chapter6SummerPastel";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -73,5 +74,48 @@ describe("Chapter6SummerPastel", () => {
   it("has anchor id chapter-6 so the RSVP CTA can scroll to it", () => {
     const { container } = renderChapter();
     expect(container.querySelector("#chapter-6")).not.toBeNull();
+  });
+
+  it("opens a fullscreen lightbox when a look polaroid is clicked", async () => {
+    const user = userEvent.setup();
+    renderChapter();
+    // Lightbox is closed initially
+    expect(
+      screen.queryByRole("dialog", { name: /fullscreen/i }),
+    ).not.toBeInTheDocument();
+
+    // Click the first polaroid
+    const first = screen.getByRole("button", {
+      name: /open look 1 in full size/i,
+    });
+    await user.click(first);
+
+    expect(
+      screen.getByRole("dialog", { name: /fullscreen/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByAltText(/Look 1 fullscreen/i)).toBeInTheDocument();
+  });
+
+  it("closes the lightbox when the close button is clicked", async () => {
+    const user = userEvent.setup();
+    renderChapter();
+    await user.click(
+      screen.getByRole("button", { name: /open look 1 in full size/i }),
+    );
+    await user.click(screen.getByRole("button", { name: /^close$/i }));
+    expect(
+      screen.queryByRole("dialog", { name: /fullscreen/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("navigates to the next look when the next arrow is clicked", async () => {
+    const user = userEvent.setup();
+    renderChapter();
+    await user.click(
+      screen.getByRole("button", { name: /open look 1 in full size/i }),
+    );
+    expect(screen.getByAltText(/Look 1 fullscreen/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /next look/i }));
+    expect(screen.getByAltText(/Look 2 fullscreen/i)).toBeInTheDocument();
   });
 });

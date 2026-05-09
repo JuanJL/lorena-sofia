@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import ChapterHeader from "./ChapterHeader";
 
@@ -16,7 +16,6 @@ const SWATCHES = [
 ];
 
 // Six photo slots — drop files at these paths and they appear automatically.
-// Until then, each card shows a friendly placeholder.
 const LOOKS = [
   "/dress-code/look-1.jpg",
   "/dress-code/look-2.jpg",
@@ -29,9 +28,10 @@ const LOOKS = [
 interface LookCardProps {
   src: string;
   index: number;
+  onOpen: (index: number) => void;
 }
 
-function LookCard({ src, index }: LookCardProps) {
+function LookCard({ src, index, onOpen }: LookCardProps) {
   const [errored, setErrored] = useState(false);
   const tapeColors = ["washi-tape", "washi-tape washi-tape-gold"];
   const tapeIdx = index % tapeColors.length;
@@ -39,7 +39,9 @@ function LookCard({ src, index }: LookCardProps) {
   const cardRot = (((index * 53) % 60) - 30) / 10; // -3 to +3 deg
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
+      onClick={() => onOpen(index)}
       initial={{ opacity: 0, y: 30, rotate: cardRot + 6 }}
       whileInView={{ opacity: 1, y: 0, rotate: cardRot }}
       viewport={{ once: true, amount: 0.2 }}
@@ -49,7 +51,8 @@ function LookCard({ src, index }: LookCardProps) {
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover={{ y: -4, rotate: 0, transition: { duration: 0.3 } }}
-      className="polaroid-shadow relative rounded-sm bg-white p-3 pb-7"
+      aria-label={`Open look ${index + 1} in full size`}
+      className="polaroid-shadow group relative cursor-pointer rounded-sm bg-white p-3 pb-7"
     >
       {/* Washi tape */}
       <div
@@ -92,21 +95,215 @@ function LookCard({ src, index }: LookCardProps) {
             alt={`Look ${index + 1}`}
             fill
             sizes="(max-width: 768px) 50vw, 320px"
-            className="glossary-photo object-cover"
-            // Hide the Pinterest watermark in the top-left of the inspiration
-            // images by biasing the crop towards the bottom-right.
+            className="glossary-photo object-cover transition-transform duration-500 group-hover:scale-105"
             style={{ objectPosition: "center 35%" }}
             onError={() => setErrored(true)}
           />
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-paper/35 mix-blend-multiply" />
+
+        {/* Subtle expand affordance — top-right, fades on hover */}
+        {!errored && (
+          <div
+            className="pointer-events-none absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gold-deep shadow-sm ring-1 ring-gold/40 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-0"
+            aria-hidden="true"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 3 L21 3 L21 9 M21 3 L13 11 M9 21 L3 21 L3 15 M3 21 L11 13" />
+            </svg>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </motion.button>
+  );
+}
+
+interface LightboxProps {
+  open: boolean;
+  index: number;
+  total: number;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+  src: string;
+}
+
+function Lightbox({
+  open,
+  index,
+  total,
+  onClose,
+  onPrev,
+  onNext,
+  src,
+}: LightboxProps) {
+  // Lock body scroll while open
+  useEffect(() => {
+    if (!open) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [open]);
+
+  // Esc to close, arrows to navigate
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") onPrev();
+      else if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose, onPrev, onNext]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Outfit look fullscreen"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/85 backdrop-blur-sm"
+        >
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Close"
+            className="absolute top-5 right-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 6 L18 18 M6 18 L18 6" />
+            </svg>
+          </button>
+
+          {/* Counter */}
+          <div className="absolute top-7 left-1/2 z-10 -translate-x-1/2 text-[11px] font-medium tracking-[0.4em] text-white/80 uppercase tabular-nums">
+            {index + 1} / {total}
+          </div>
+
+          {/* Prev */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrev();
+            }}
+            aria-label="Previous look"
+            className="absolute top-1/2 left-3 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 md:left-6 md:h-14 md:w-14"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 6 L9 12 L15 18" />
+            </svg>
+          </button>
+
+          {/* Next */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext();
+            }}
+            aria-label="Next look"
+            className="absolute top-1/2 right-3 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 md:right-6 md:h-14 md:w-14"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 6 L15 12 L9 18" />
+            </svg>
+          </button>
+
+          {/* The image */}
+          <motion.div
+            key={src}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[88vh] w-auto px-12 md:px-20"
+          >
+            <Image
+              src={src}
+              alt={`Look ${index + 1} fullscreen`}
+              width={900}
+              height={1500}
+              priority
+              className="h-auto max-h-[88vh] w-auto rounded-md object-contain shadow-2xl"
+              sizes="(max-width: 768px) 90vw, 70vw"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 export default function Chapter6SummerPastel() {
   const { lang } = useLanguage();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const open = openIndex !== null;
+  const handleOpen = useCallback((i: number) => setOpenIndex(i), []);
+  const handleClose = useCallback(() => setOpenIndex(null), []);
+  const handlePrev = useCallback(
+    () =>
+      setOpenIndex((cur) =>
+        cur === null ? cur : (cur - 1 + LOOKS.length) % LOOKS.length,
+      ),
+    [],
+  );
+  const handleNext = useCallback(
+    () =>
+      setOpenIndex((cur) => (cur === null ? cur : (cur + 1) % LOOKS.length)),
+    [],
+  );
 
   const copy =
     lang === "es"
@@ -133,6 +330,7 @@ export default function Chapter6SummerPastel() {
           ],
           paletteIntro: "La paleta",
           looksIntro: "Inspiración",
+          tapToOpen: "Haz clic para ampliar",
         }
       : {
           number: "Chapter VI",
@@ -157,6 +355,7 @@ export default function Chapter6SummerPastel() {
           ],
           paletteIntro: "The palette",
           looksIntro: "Inspiration",
+          tapToOpen: "Click to enlarge",
         };
 
   return (
@@ -258,21 +457,34 @@ export default function Chapter6SummerPastel() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-20"
         >
-          <div className="mb-8 flex items-center justify-center gap-3">
+          <div className="mb-3 flex items-center justify-center gap-3">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold/40" />
             <p className="text-[10px] font-medium tracking-[0.4em] text-gold-deep uppercase">
               {copy.looksIntro}
             </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold/40" />
           </div>
+          <p className="mb-8 text-center font-hand text-sm text-rose-deep md:text-base">
+            {copy.tapToOpen}
+          </p>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:gap-8">
             {LOOKS.map((src, i) => (
-              <LookCard key={src} src={src} index={i} />
+              <LookCard key={src} src={src} index={i} onOpen={handleOpen} />
             ))}
           </div>
         </motion.div>
       </div>
+
+      <Lightbox
+        open={open}
+        index={openIndex ?? 0}
+        total={LOOKS.length}
+        onClose={handleClose}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        src={openIndex !== null ? LOOKS[openIndex] : LOOKS[0]}
+      />
     </section>
   );
 }
