@@ -184,20 +184,22 @@ export default function AdminPage() {
                       key={rsvp.id}
                       className="border-b border-gold-lighter/50 transition-colors hover:bg-cream-dark/20"
                     >
-                      <td className="px-4 py-3 font-medium text-warm-dark">
+                      <td className="px-4 py-3 align-top font-medium text-warm-dark">
                         {rsvp.name}
                       </td>
-                      <td className="px-4 py-3 text-warm-gray">
+                      <td className="px-4 py-3 align-top text-warm-gray">
                         {rsvp.email || "—"}
                       </td>
-                      <td className="px-4 py-3 text-warm-dark">{rsvp.guests}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 align-top text-warm-dark">
+                        {rsvp.guests}
+                      </td>
+                      <td className="px-4 py-3 align-top">
                         {attendanceBadge(rsvp.attendance)}
                       </td>
-                      <td className="max-w-[200px] truncate px-4 py-3 text-warm-gray">
+                      <td className="min-w-[220px] max-w-[460px] px-4 py-3 align-top text-warm-gray whitespace-pre-wrap break-words">
                         {rsvp.message || "—"}
                       </td>
-                      <td className="px-4 py-3 text-warm-gray">
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-warm-gray">
                         {new Date(rsvp.timestamp).toLocaleDateString()}
                       </td>
                     </tr>
@@ -244,13 +246,13 @@ export default function AdminPage() {
                       key={entry.id}
                       className="border-b border-gold-lighter/50 transition-colors hover:bg-cream-dark/20"
                     >
-                      <td className="px-4 py-3 font-medium text-warm-dark">
+                      <td className="px-4 py-3 align-top font-medium text-warm-dark">
                         {entry.name}
                       </td>
-                      <td className="max-w-[280px] truncate px-4 py-3 text-warm-gray">
+                      <td className="min-w-[260px] max-w-[520px] px-4 py-3 align-top text-warm-gray whitespace-pre-wrap break-words">
                         {entry.message || "—"}
                       </td>
-                      <td className="px-4 py-3 text-warm-gray">
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-warm-gray">
                         {new Date(entry.timestamp).toLocaleDateString()}
                       </td>
                     </tr>
