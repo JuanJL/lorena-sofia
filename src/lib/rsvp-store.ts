@@ -1,11 +1,14 @@
 /**
- * RSVP storage layer.
+ * Storage layer for guest sign-ups.
+ *
+ * Two independent lists are kept:
+ *   - the main birthday RSVP   (`lorenasofia:rsvps`     / data/rsvps.json)
+ *   - the afterparty sign-up   (`lorenasofia:afterparty`/ data/afterparty.json)
  *
  * On Vercel (or any host that exposes KV_REST_API_URL / KV_REST_API_TOKEN
- * env vars from the Vercel KV / Upstash integration) this writes RSVPs
- * into a Redis list. Locally, when those env vars are missing, it falls
- * back to a JSON file at `<repo>/data/rsvps.json` so dev keeps working
- * without any cloud setup.
+ * env vars from the Vercel KV / Upstash integration) each list is a Redis
+ * list. Locally, when those env vars are missing, each list falls back to a
+ * JSON file under `<repo>/data/` so dev keeps working without any cloud setup.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
@@ -21,8 +24,20 @@ export interface RSVP {
   timestamp: string;
 }
 
-const KV_KEY = "lorenasofia:rsvps";
-const DATA_FILE = join(process.cwd(), "data", "rsvps.json");
+/** A sign-up for the Colombia vs Portugal afterparty at Napols. */
+export interface AfterpartyEntry {
+  id: string;
+  name: string;
+  message?: string;
+  timestamp: string;
+}
+
+const RSVP_KV_KEY = "lorenasofia:rsvps";
+const AFTERPARTY_KV_KEY = "lorenasofia:afterparty";
+
+function dataFile(name: string): string {
+  return join(process.cwd(), "data", `${name}.json`);
+}
 
 function hasKv(): boolean {
   return Boolean(
@@ -32,65 +47,89 @@ function hasKv(): boolean {
 
 // ---------- File-backed (development) ----------
 
-function fileGetAll(): RSVP[] {
+function fileGetAll<T>(file: string): T[] {
   try {
-    if (!existsSync(DATA_FILE)) return [];
-    return JSON.parse(readFileSync(DATA_FILE, "utf-8"));
+    if (!existsSync(file)) return [];
+    return JSON.parse(readFileSync(file, "utf-8")) as T[];
   } catch {
     return [];
   }
 }
 
-function fileAdd(rsvp: RSVP) {
-  const all = fileGetAll();
-  all.push(rsvp);
-  mkdirSync(dirname(DATA_FILE), { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(all, null, 2));
+function fileAdd<T>(file: string, entry: T): void {
+  const all = fileGetAll<T>(file);
+  all.push(entry);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(all, null, 2));
 }
 
 // ---------- Vercel KV (production) ----------
 
-async function kvGetAll(): Promise<RSVP[]> {
+async function kvGetAll<T>(key: string): Promise<T[]> {
   // Stored as a Redis list — newest at index 0 because we use lpush.
   // Reverse so callers always get chronological order.
-  const raw = (await kv.lrange(KV_KEY, 0, -1)) ?? [];
+  const raw = (await kv.lrange(key, 0, -1)) ?? [];
   // Vercel KV auto-deserialises JSON when the value was stored as JSON;
   // be defensive against either form.
   const items = raw
-    .map((entry: unknown): RSVP | null => {
+    .map((entry: unknown): T | null => {
       if (typeof entry === "string") {
         try {
-          return JSON.parse(entry) as RSVP;
+          return JSON.parse(entry) as T;
         } catch {
           return null;
         }
       }
-      if (entry && typeof entry === "object") return entry as RSVP;
+      if (entry && typeof entry === "object") return entry as T;
       return null;
     })
-    .filter((item: RSVP | null): item is RSVP => item !== null);
+    .filter((item: T | null): item is T => item !== null);
   return items.reverse();
 }
 
-async function kvAdd(rsvp: RSVP) {
-  await kv.lpush(KV_KEY, JSON.stringify(rsvp));
+async function kvAdd<T>(key: string, entry: T): Promise<void> {
+  await kv.lpush(key, JSON.stringify(entry));
 }
 
-// ---------- Public API ----------
+// ---------- Generic dispatch ----------
 
-export async function getAllRSVPs(): Promise<RSVP[]> {
-  return hasKv() ? kvGetAll() : fileGetAll();
+async function getEntries<T>(kvKey: string, fileName: string): Promise<T[]> {
+  return hasKv() ? kvGetAll<T>(kvKey) : fileGetAll<T>(dataFile(fileName));
 }
 
-export async function addRSVP(rsvp: RSVP): Promise<void> {
+async function addEntry<T>(
+  kvKey: string,
+  fileName: string,
+  entry: T,
+): Promise<void> {
   if (hasKv()) {
-    await kvAdd(rsvp);
+    await kvAdd<T>(kvKey, entry);
   } else {
-    fileAdd(rsvp);
+    fileAdd<T>(dataFile(fileName), entry);
   }
 }
 
-/** Exposed so the route can tell which backend is active in logs. */
+// ---------- Public API: main RSVP ----------
+
+export async function getAllRSVPs(): Promise<RSVP[]> {
+  return getEntries<RSVP>(RSVP_KV_KEY, "rsvps");
+}
+
+export async function addRSVP(rsvp: RSVP): Promise<void> {
+  return addEntry<RSVP>(RSVP_KV_KEY, "rsvps", rsvp);
+}
+
+// ---------- Public API: afterparty ----------
+
+export async function getAllAfterparty(): Promise<AfterpartyEntry[]> {
+  return getEntries<AfterpartyEntry>(AFTERPARTY_KV_KEY, "afterparty");
+}
+
+export async function addAfterparty(entry: AfterpartyEntry): Promise<void> {
+  return addEntry<AfterpartyEntry>(AFTERPARTY_KV_KEY, "afterparty", entry);
+}
+
+/** Exposed so routes can tell which backend is active in logs. */
 export function activeBackend(): "kv" | "file" {
   return hasKv() ? "kv" : "file";
 }

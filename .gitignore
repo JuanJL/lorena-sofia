@@ -24,6 +24,11 @@
 .DS_Store
 *.pem
 
+# local dev RSVP/afterparty data (production uses Vercel KV).
+# Never commit guest PII (names/emails) into git history.
+/data/*.json
+!/data/.gitkeep
+
 # debug
 npm-debug.log*
 yarn-debug.log*

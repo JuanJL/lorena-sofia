@@ -87,3 +87,50 @@ describe("rsvp-store (KV detection)", () => {
     expect(activeBackend()).toBe("kv");
   });
 });
+
+describe("afterparty-store (file fallback)", () => {
+  function makeAfterparty(name: string) {
+    return {
+      id: crypto.randomUUID(),
+      name,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  it("keeps the afterparty list separate from the main RSVP list", async () => {
+    const { addRSVP, addAfterparty, getAllRSVPs, getAllAfterparty } =
+      await import("@/lib/rsvp-store");
+
+    await addRSVP(makeRSVP({ name: "Main Guest" }));
+    await addAfterparty(makeAfterparty("Footy Fan"));
+
+    const rsvps = await getAllRSVPs();
+    const after = await getAllAfterparty();
+
+    expect(rsvps).toHaveLength(1);
+    expect(rsvps[0].name).toBe("Main Guest");
+    expect(after).toHaveLength(1);
+    expect(after[0].name).toBe("Footy Fan");
+  });
+
+  it("writes afterparty entries to data/afterparty.json", async () => {
+    const { addAfterparty, getAllAfterparty } = await import(
+      "@/lib/rsvp-store"
+    );
+    await addAfterparty(makeAfterparty("Solo"));
+    const file = join(tempDir, "data", "afterparty.json");
+    const json = JSON.parse(readFileSync(file, "utf-8"));
+    expect(json).toHaveLength(1);
+    expect((await getAllAfterparty())[0].name).toBe("Solo");
+  });
+
+  it("returns afterparty entries in chronological order", async () => {
+    const { addAfterparty, getAllAfterparty } = await import(
+      "@/lib/rsvp-store"
+    );
+    await addAfterparty(makeAfterparty("Uno"));
+    await addAfterparty(makeAfterparty("Dos"));
+    const list = await getAllAfterparty();
+    expect(list.map((e) => e.name)).toEqual(["Uno", "Dos"]);
+  });
+});

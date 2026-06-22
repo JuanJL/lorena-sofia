@@ -28,11 +28,11 @@ export const metadata: Metadata = {
   description:
     "Un cuento mágico para celebrar el cumpleaños de Lorena Sofía. 27 de junio de 2026, Barcelona. Comienza una nueva era.",
   openGraph: {
-    title: "Lorena Sofía — Save the Date | 27.06.26",
+    title: "Lorena Sofía — Te invito a mi cumpleaños | 27.06.26",
     description:
-      "Comienza una nueva era. Un día para celebrar todo lo vivido, todo lo que somos y todo lo que está por venir.",
+      "Una noche para celebrar todo lo que soy y todo lo que viene. 27.06.26 · Maska Gastropub, Barcelona · desde las 7:30 PM.",
     type: "website",
-    images: [{ url: "/poster.jpg", width: 1075, height: 1418 }],
+    images: [{ url: "/poster.jpg", width: 1100, height: 1493 }],
   },
 };
 

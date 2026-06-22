@@ -36,6 +36,10 @@ export default function Chapter5RSVP() {
             "Tu firma ha entrado al cuento. Guarda el 27.06.26 y prep\u00E1rate para bailar.",
           nextStepLabel: "Tu siguiente paso",
           nextStepCta: "Descubre el c\u00F3digo de vestimenta",
+          afterpartyNote:
+            "\u00BFFan del f\u00FAtbol? No olvides apuntarte al afterparty para ver Colombia vs Portugal \u26BD",
+          afterpartyCta: "Ir al afterparty",
+          error: "Hubo un error. Por favor intenta de nuevo.",
           guestUnit: (n: number) =>
             n === 1 ? "1 persona" : `${n} personas`,
         }
@@ -64,6 +68,10 @@ export default function Chapter5RSVP() {
             "Your signature is in the tale. Mark 27.06.26 and get ready to dance.",
           nextStepLabel: "Your next step",
           nextStepCta: "Discover the dress code",
+          afterpartyNote:
+            "Football fan? Don't forget to sign up for the afterparty to watch Colombia vs Portugal ⚽",
+          afterpartyCta: "Go to the afterparty",
+          error: "Something went wrong. Please try again.",
           guestUnit: (n: number) =>
             n === 1 ? "1 person" : `${n} people`,
         };
@@ -228,6 +236,31 @@ export default function Chapter5RSVP() {
                     <path d="M5 12 H19 M13 6 L19 12 L13 18" />
                   </svg>
                 </a>
+
+                {/* Afterparty reminder */}
+                <div className="mt-8 rounded-2xl border border-gold/30 bg-white/50 p-5">
+                  <p className="font-hand text-lg text-warm-dark/85 md:text-xl">
+                    {copy.afterpartyNote}
+                  </p>
+                  <a
+                    href="#afterparty"
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium tracking-widest text-gold-deep uppercase transition-colors hover:text-rose-deep"
+                  >
+                    {copy.afterpartyCta}
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12 H19 M13 6 L19 12 L13 18" />
+                    </svg>
+                  </a>
+                </div>
               </motion.div>
             )}
 
@@ -329,6 +362,8 @@ export default function Chapter5RSVP() {
                   }
                   className="w-full border-b-2 border-warm-dark/30 bg-transparent px-1 py-2 font-hand text-2xl text-ink focus:border-gold focus:outline-none md:text-3xl"
                   placeholder="________________"
+                  aria-label={copy.nameLabel}
+                  autoComplete="name"
                 />
               </div>
 
@@ -343,6 +378,8 @@ export default function Chapter5RSVP() {
                     setFormData((p) => ({ ...p, email: e.target.value }))
                   }
                   className="w-full border-b border-warm-dark/30 bg-transparent px-1 py-2 text-warm-dark focus:border-gold focus:outline-none"
+                  aria-label={copy.emailLabel}
+                  autoComplete="email"
                 />
               </div>
 
@@ -351,7 +388,11 @@ export default function Chapter5RSVP() {
                 <label className="mb-3 block font-hand text-lg text-rose-deep">
                   {copy.attendanceLabel} *
                 </label>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div
+                  role="radiogroup"
+                  aria-label={copy.attendanceLabel}
+                  className="grid gap-3 sm:grid-cols-3"
+                >
                   {attendanceOptions.map((opt) => (
                     <label
                       key={opt.value}
@@ -394,6 +435,7 @@ export default function Chapter5RSVP() {
                   rows={3}
                   placeholder={copy.messagePlaceholder}
                   className="w-full resize-none border-b border-warm-dark/30 bg-transparent px-1 py-2 font-hand text-lg text-ink placeholder:text-warm-gray/40 focus:border-gold focus:outline-none"
+                  aria-label={copy.messageLabel}
                 />
               </div>
 
@@ -421,7 +463,7 @@ export default function Chapter5RSVP() {
 
               {status === "error" && (
                 <p className="text-center font-hand text-lg text-red-500">
-                  Hubo un error. Por favor intenta de nuevo.
+                  {copy.error}
                 </p>
               )}
             </form>

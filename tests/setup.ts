@@ -9,50 +9,65 @@ afterEach(() => {
 // Mock framer-motion to render plain elements for predictable tests
 vi.mock("framer-motion", async () => {
   const React = await import("react");
+
+  // Cache one stable component per tag. Returning a fresh component on every
+  // property access would make React remount the subtree on each render,
+  // which loses controlled-input state mid-typing in tests.
+  const componentCache = new Map<string, React.ElementType>();
+
+  const makeComponent = (tag: string) => {
+    const Component = React.forwardRef(
+      (
+        { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,
+        ref: React.Ref<HTMLElement>,
+      ) => {
+        // Strip framer-motion-only props so React doesn't warn
+        const safeProps: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(rest)) {
+          if (
+            [
+              "initial",
+              "animate",
+              "exit",
+              "transition",
+              "whileHover",
+              "whileTap",
+              "whileDrag",
+              "whileInView",
+              "viewport",
+              "drag",
+              "dragElastic",
+              "dragSnapToOrigin",
+              "dragTransition",
+              "layout",
+              "layoutId",
+              "variants",
+              "onDragStart",
+              "onDrag",
+              "onDragEnd",
+            ].includes(key)
+          ) {
+            continue;
+          }
+          safeProps[key] = value;
+        }
+        return React.createElement(tag, { ...safeProps, ref }, children);
+      },
+    );
+    Component.displayName = `motion.${tag}`;
+    return Component;
+  };
+
   const handler = {
     get: (_target: unknown, prop: string | symbol) => {
       // Preserve the underlying HTML tag (motion.button → 'button',
       // motion.div → 'div', etc.) so semantic role queries in tests work.
       const tag =
         typeof prop === "string" && /^[a-z]+$/i.test(prop) ? prop : "div";
-      return React.forwardRef(
-        (
-          { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,
-          ref: React.Ref<HTMLElement>,
-        ) => {
-          // Strip framer-motion-only props so React doesn't warn
-          const safeProps: Record<string, unknown> = {};
-          for (const [key, value] of Object.entries(rest)) {
-            if (
-              [
-                "initial",
-                "animate",
-                "exit",
-                "transition",
-                "whileHover",
-                "whileTap",
-                "whileDrag",
-                "whileInView",
-                "viewport",
-                "drag",
-                "dragElastic",
-                "dragSnapToOrigin",
-                "dragTransition",
-                "layout",
-                "layoutId",
-                "variants",
-                "onDragStart",
-                "onDrag",
-                "onDragEnd",
-              ].includes(key)
-            ) {
-              continue;
-            }
-            safeProps[key] = value;
-          }
-          return React.createElement(tag, { ...safeProps, ref }, children);
-        },
-      );
+      if (!componentCache.has(tag)) {
+        componentCache.set(tag, makeComponent(tag));
+      }
+      return componentCache.get(tag);
     },
   };
   const motion = new Proxy({}, handler);

@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TARGET = new Date("2026-06-27T20:00:00+02:00").getTime();
+// 27 June 2026, 7:30 PM Barcelona time (CEST, +02:00) — matches the
+// advertised "Desde las 7:30 PM" start shown across the site.
+const TARGET = new Date("2026-06-27T19:30:00+02:00").getTime();
 
 function calc() {
   const diff = Math.max(0, TARGET - Date.now());

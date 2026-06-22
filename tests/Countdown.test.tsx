@@ -9,10 +9,10 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe("Countdown", () => {
   beforeEach(() => {
-    // Freeze time exactly 100 days before the party so we get a deterministic countdown
-    // Target: 2026-06-27T20:00:00+02:00
+    // Freeze time exactly 100 days before the party so we get a deterministic countdown.
+    // Target: 2026-06-27T19:30:00+02:00 → 100 days earlier is 2026-03-19T19:30:00+02:00.
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-19T20:00:00+02:00"));
+    vi.setSystemTime(new Date("2026-03-19T19:30:00+02:00"));
   });
 
   afterEach(() => {

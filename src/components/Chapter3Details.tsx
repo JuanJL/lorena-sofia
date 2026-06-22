@@ -4,37 +4,42 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import ChapterHeader from "./ChapterHeader";
 
+const MAPS_URL = "https://share.google/VTONom5YpanGCSma6";
+
 export default function Chapter3Details() {
   const { lang } = useLanguage();
   const copy =
     lang === "es"
       ? {
-          number: "Cap\u00EDtulo III",
+          number: "Capítulo III",
           title: "El Lugar y la Hora",
           subtitle: "el escenario del cuento",
-          when: "Cu\u00E1ndo",
-          whenDate: "27 de Junio, 2026",
-          whenDay: "S\u00E1bado",
-          where: "D\u00F3nde",
-          whereCity: "Barcelona",
-          whereCountry: "Espa\u00F1a",
-          secretNote:
-            "El lugar exacto, el c\u00F3digo de vestimenta y los detalles m\u00E1gicos\u2026 llegan pronto.",
-          stamp: "Pr\u00F3ximamente",
+          when: "Cuándo",
+          whenDay: "Sábado",
+          timeNote: "Desde las 7:30 PM",
+          where: "Dónde",
+          venue: "Maska Gastropub",
+          addressLine1: "Carrer de Pau Claris, 164",
+          addressLine2: "08037 Barcelona",
+          mapButton: "Ver en el mapa",
+          dressNote:
+            "Código de vestimenta: Carnaval en colores pastel.",
+          dressCta: "Ver la inspiración",
         }
       : {
           number: "Chapter III",
           title: "The Place and the Hour",
           subtitle: "the stage of the tale",
           when: "When",
-          whenDate: "June 27, 2026",
           whenDay: "Saturday",
+          timeNote: "From 7:30 PM",
           where: "Where",
-          whereCity: "Barcelona",
-          whereCountry: "Spain",
-          secretNote:
-            "The exact venue, dress code, and magical details\u2026 coming soon.",
-          stamp: "Coming Soon",
+          venue: "Maska Gastropub",
+          addressLine1: "Carrer de Pau Claris, 164",
+          addressLine2: "08037 Barcelona",
+          mapButton: "View on the map",
+          dressNote: "Dress code: Carnival in pastel colors.",
+          dressCta: "See the inspiration",
         };
 
   return (
@@ -86,6 +91,26 @@ export default function Chapter3Details() {
               <div className="mt-4 font-hand text-2xl text-rose-deep">
                 {copy.whenDay}
               </div>
+              {/* Start time */}
+              <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/50 px-4 py-1.5">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gold-deep"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7 V12 L15.5 14" />
+                </svg>
+                <span className="font-heading text-sm tracking-wide text-warm-dark md:text-base">
+                  {copy.timeNote}
+                </span>
+              </div>
             </div>
 
             {/* Ticket perforations */}
@@ -124,8 +149,8 @@ export default function Chapter3Details() {
             <div className="mt-6 text-center">
               <div className="mb-3 flex items-center justify-center">
                 <svg
-                  width="36"
-                  height="36"
+                  width="34"
+                  height="34"
                   viewBox="0 0 24 24"
                   fill="none"
                   className="text-rose-deep animate-bounce-gentle"
@@ -139,22 +164,41 @@ export default function Chapter3Details() {
                   <circle cx="12" cy="10" r="3" fill="currentColor" />
                 </svg>
               </div>
-              <div className="font-heading text-4xl text-warm-dark md:text-5xl">
-                {copy.whereCity}
+              <div className="font-heading text-3xl text-warm-dark md:text-4xl">
+                {copy.venue}
               </div>
-              <div className="mt-2 text-sm tracking-[0.2em] text-warm-gray uppercase">
-                {copy.whereCountry}
+              <div className="mt-3 text-sm leading-relaxed text-warm-gray md:text-base">
+                <p>{copy.addressLine1}</p>
+                <p>{copy.addressLine2}</p>
               </div>
 
-              {/* Decorative stamp */}
-              <div className="mt-6 inline-block rotate-[-8deg] rounded border-2 border-dashed border-rose-deep/60 px-4 py-1 font-hand text-sm tracking-widest text-rose-deep/80 uppercase">
-                {copy.stamp}
-              </div>
+              {/* Map button */}
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-6 inline-flex items-center gap-2 rounded-full border border-gold/50 bg-gradient-to-r from-rose-deep to-gold px-6 py-2.5 font-heading text-sm font-semibold tracking-widest text-white uppercase shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 21C12 21 5 14.5 5 10C5 6.13 8.13 3 12 3C15.87 3 19 6.13 19 10C19 14.5 12 21 12 21Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>{copy.mapButton}</span>
+              </a>
             </div>
           </motion.div>
         </div>
 
-        {/* Secret note */}
+        {/* Dress-code note */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -163,8 +207,26 @@ export default function Chapter3Details() {
           className="mx-auto mt-14 max-w-xl text-center"
         >
           <p className="font-hand text-xl text-warm-dark/80 italic md:text-2xl">
-            “{copy.secretNote}”
+            {copy.dressNote}
           </p>
+          <a
+            href="#chapter-6"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium tracking-widest text-gold-deep uppercase transition-colors hover:text-rose-deep"
+          >
+            {copy.dressCta}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12 H19 M13 6 L19 12 L13 18" />
+            </svg>
+          </a>
         </motion.div>
       </div>
     </section>

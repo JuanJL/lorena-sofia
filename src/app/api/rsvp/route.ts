@@ -20,11 +20,13 @@ export async function POST(request: Request) {
 
     const newRSVP: RSVP = {
       id: crypto.randomUUID(),
-      name: String(body.name).trim(),
-      email: body.email ? String(body.email).trim() : undefined,
+      name: String(body.name).trim().slice(0, 100),
+      email: body.email ? String(body.email).trim().slice(0, 200) : undefined,
       guests: Math.min(Math.max(Number(body.guests) || 1, 1), 5),
       attendance: body.attendance,
-      message: body.message ? String(body.message).trim() : undefined,
+      message: body.message
+        ? String(body.message).trim().slice(0, 500)
+        : undefined,
       timestamp: new Date().toISOString(),
     };
 

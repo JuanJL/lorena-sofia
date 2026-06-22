@@ -16,6 +16,8 @@ export default function Chapter1SaveTheDate() {
           date: "Save the Date",
           until:
             "\u2014 Y el cuento comienza en\u2026 \u2014",
+          venue: "Maska Gastropub \u00B7 Barcelona",
+          time: "Desde las 7:30 PM",
         }
       : {
           number: "Chapter I",
@@ -23,6 +25,8 @@ export default function Chapter1SaveTheDate() {
           subtitle: "a date that changed everything",
           date: "Save the Date",
           until: "\u2014 And the tale begins in\u2026 \u2014",
+          venue: "Maska Gastropub \u00B7 Barcelona",
+          time: "From 7:30 PM",
         };
 
   const dateChars = "27 \u00B7 06 \u00B7 26".split("");
@@ -153,6 +157,38 @@ export default function Chapter1SaveTheDate() {
               {copy.until}
             </p>
             <Countdown />
+          </motion.div>
+
+          {/* Compact venue + time chip */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-12 flex flex-col items-center gap-2"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/50 px-5 py-2 backdrop-blur-sm">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-rose-deep"
+              >
+                <path d="M12 21C12 21 5 14.5 5 10C5 6.13 8.13 3 12 3C15.87 3 19 6.13 19 10C19 14.5 12 21 12 21Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span className="font-heading text-sm tracking-wide text-warm-dark md:text-base">
+                {copy.venue}
+              </span>
+            </div>
+            <p className="text-xs font-medium tracking-[0.25em] text-gold-deep uppercase md:text-sm">
+              {copy.time}
+            </p>
           </motion.div>
         </div>
       </div>
