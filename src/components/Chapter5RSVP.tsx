@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import { useLanguage } from "@/context/LanguageContext";
+import { SHOW_AFTERPARTY } from "@/lib/config";
 import ChapterHeader from "./ChapterHeader";
 
 export default function Chapter5RSVP() {
@@ -237,30 +238,32 @@ export default function Chapter5RSVP() {
                   </svg>
                 </a>
 
-                {/* Afterparty reminder */}
-                <div className="mt-8 rounded-2xl border border-gold/30 bg-white/50 p-5">
-                  <p className="font-hand text-lg text-warm-dark/85 md:text-xl">
-                    {copy.afterpartyNote}
-                  </p>
-                  <a
-                    href="#afterparty"
-                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium tracking-widest text-gold-deep uppercase transition-colors hover:text-rose-deep"
-                  >
-                    {copy.afterpartyCta}
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                {/* Afterparty reminder — only when the afterparty is live */}
+                {SHOW_AFTERPARTY && (
+                  <div className="mt-8 rounded-2xl border border-gold/30 bg-white/50 p-5">
+                    <p className="font-hand text-lg text-warm-dark/85 md:text-xl">
+                      {copy.afterpartyNote}
+                    </p>
+                    <a
+                      href="#afterparty"
+                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium tracking-widest text-gold-deep uppercase transition-colors hover:text-rose-deep"
                     >
-                      <path d="M5 12 H19 M13 6 L19 12 L13 18" />
-                    </svg>
-                  </a>
-                </div>
+                      {copy.afterpartyCta}
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12 H19 M13 6 L19 12 L13 18" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
               </motion.div>
             )}
 

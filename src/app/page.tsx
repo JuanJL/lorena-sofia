@@ -7,6 +7,7 @@ import Chapter4Glossary from "@/components/Chapter4Glossary";
 import Chapter5RSVP from "@/components/Chapter5RSVP";
 import Chapter6SummerPastel from "@/components/Chapter6SummerPastel";
 import Chapter7Epilogue from "@/components/Chapter7Epilogue";
+import { SHOW_AFTERPARTY } from "@/lib/config";
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
       <Chapter1SaveTheDate />
       <Chapter2Story />
       <Chapter3Details />
-      <AfterpartySection />
+      {SHOW_AFTERPARTY && <AfterpartySection />}
       <Chapter4Glossary />
       <Chapter5RSVP />
       <Chapter6SummerPastel />
